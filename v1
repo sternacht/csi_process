@@ -1,0 +1,51 @@
+clear;
+clc;
+filename = 'D:\Stern\2spring\csi_save\origin_data\0420\0420-4.dat';
+a = read_log_file(filename);
+si = size(a)
+for l = 6:si(1)
+    csi_entry = a{l};
+    %csi = get_scaled_csi(csi_entry);
+    b = a{l};
+    c = b.csi;
+    
+    for i = 1:2
+        for j = 1:2
+            for k = 5
+                d(i,j,k) = c(i,j,k);
+                dd(i,j,k) = c(i,j,k);
+            end
+        end
+    end
+    d = d(1,:,:);
+    dd = dd(2,:,:);
+    e = abs(squeeze(d).');
+    ee = abs(squeeze(dd).');
+    first_to_first(:,l)=e(:,1);
+    second_to_first(:,l)=e(:,2);
+    first_to_second(:,l) = ee(:,1);
+    second_to_second(:,l) = ee(:,2);
+    
+    %first(:,l) = e(:,1);
+end
+first_ant = hampel(first_to_first);
+second_ant = hampel(second_to_first);
+%matlabpool close
+figure(1)
+plot(first_to_first.')
+figure(2)
+plot(second_to_first.')
+figure(3)
+plot(first_to_second.')
+%figure(4)
+%plot(second_ant.');
+
+%{
+resultfile = append('D:\Stern\2spring\csi_save\preprocess_save\',filename,'.txt');
+fid = fopen(resultfile,'wt');
+
+for i = 1:500
+    fprintf(fid,'%f\t%f\n',first_ant_csi(4,i),second_ant_csi(4,i));
+end
+fclose(fid);
+%}
